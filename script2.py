@@ -135,7 +135,7 @@ def preprocessing_df(df):
         
     return np.array(X),y
 
-df['target'] = list(map(classify, df[RATIO_TO_PREDICT]))
+df['target'] = list(map(classify, df[RATIO_TO_PREDICT].shift(-1)))
 
 times = sorted(df.index.values)
 last_5pct = times[-int(0.05*len(times))]
