@@ -200,3 +200,5 @@ print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 # Save model
 model.save("models/{}".format(NAME))
+
+#tensorboard --logdir=logs
