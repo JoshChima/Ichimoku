@@ -1,18 +1,14 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from keras.layers import Dense, Activation
 from keras.models import Sequential, load_model
 from keras.optimizers import Adam
 
-
+from Methods import MetaTraderDataConverter, Ichimoku
 datafile="USDJPY_H1_2014_2018.csv"
-def MetaTraderDataConverter(file):
-    df=pd.read_csv(file, parse_dates=[['Date','Time']], sep='\t')
-    df['Date'] = df['Date_Time']
-    df.set_index(df.Date, drop=True, inplace=True)
-    df = df[['Open', 'High', 'Low','Close']]
-    return df
+
 
 class order:
     def __init__(self, order_number, current_date, current_price, lot_size, is_buy):
@@ -60,7 +56,7 @@ class Mainframe:
         self.range = rng
         self.furthest_t = self.current_t - self.range
 
-        self.DF_SUBSET = self.dataframe.iloc[self.furthest_t:self.current_t+1]
+        self.DF_SUBSET = Ichimoku(self.dataframe.iloc[self.furthest_t:self.current_t+1])
         # self.highs = [self.dataframe['High'].iloc[self.furthest_t:self.current_t+1]]
         # self.opens = [self.dataframe['Open'].iloc[self.furthest_t:self.current_t+1]]
         # self.lows = [self.dataframe['Low'].iloc[self.furthest_t:self.current_t+1]]
@@ -74,12 +70,12 @@ class Mainframe:
         self.OPEN_TRADES = []
         self.TRADE_HISTORY = {}
         
-        self.stateSpace = [self.balance, self.profit, self.current_t, self.]
+        #self.stateSpace = [self.balance, self.profit, self.current_t, self.]
 
     def forward(self):
         self.current_t +=1
         self.furthest_t = self.current_t - self.range
-        self.DF_SUBSET = self.dataframe.iloc[self.furthest_t:self.current_t+1]
+        self.DF_SUBSET = Ichimoku(self.dataframe.iloc[self.furthest_t:self.current_t+1])
         self.date_t = self.dataframe.index[self.current_t]
         self.price_t = self.dataframe['Close'].iloc[self.current_t]
         for order in self.OPEN_TRADES:
@@ -128,7 +124,7 @@ class Mainframe:
      #def action(self, choice):
       #   if choice == 0:
 
-Trader = Mainframe(datafile, 20, 10000)
+Trader = Mainframe(datafile, 100, 10000)
 
 Trader.show()
 for i in range(5):
