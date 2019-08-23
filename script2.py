@@ -35,7 +35,7 @@ def Ichimoku(dataframe):
     period52_low = d['Low'].rolling(window=52).min()
     d['senkou_span_b'] = ((period52_high + period52_low) / 2).shift(52)
     # The most current closing price plotted 26 time periods behind (optional)
-    #d['chikou_span'] = d['Close'].shift(-26)
+    d['chikou_span'] = d['Close'].shift(-26)
     d['pct_change'] = (d['Close']-d['Close'].shift(1))/d['Close'].shift(1)*100
 
     

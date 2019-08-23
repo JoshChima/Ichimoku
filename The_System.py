@@ -113,12 +113,22 @@ class Mainframe:
 
     def profits(self):
         total_profit = 0
+        already_checked = []
+        for ordernum in self.TRADE_HISTORY.keys():
+            if ordernum not in already_checked:
+                ORDER = self.TRADE_HISTORY[ordernum]
+                total_profit += ORDER.get_profit()
+                already_checked.append(ordernum)
         for order in self.OPEN_TRADES:
-            total_profit += order.get_profit()
-        self.profit = total_profit
+            if order.get_order_number() not in already_checked:
+                total_profit += order.get_profit()
+                already_checked.append(order.get_order_number())
+        self.profit += total_profit
+
     def show(self):
         print("##################################")
         print("Profit: {}".format(self.profit))
+        print("Balance: {}".format(self.balance + self.profit))
         print(self.dataframe.index[self.furthest_t], 'to', self.dataframe.index[self.current_t])
     
      #def action(self, choice):

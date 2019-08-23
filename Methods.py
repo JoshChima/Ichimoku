@@ -7,6 +7,7 @@ import plotly
 import plotly.graph_objs as go
 import os
 from plotly.offline import init_notebook_mode, plot, iplot
+import plotly
 
 def MetaTraderDataConverter(file):
     df=pd.read_csv(file, parse_dates=[['Date','Time']], sep='\t')
@@ -137,29 +138,33 @@ def Ichimoku_plot(d):
     return d
     #fig.show(renderer="png")
 
+def u_d(num):
+    if num < 0:
+        return -1
+    else:
+        return 1
+
 def NeoCandle(OHLC):
+    
     df = OHLC
-    df['DOC'] = abs(df['Open'] - df['Close'])
-    df['DHL'] = abs(df['High'] - df['Low'])
+    df['Change'] = df['Close']-df['Close'].shift(1)
+    df['U_D'] = df['Change'].apply(u_d)
+    df['DHL'] = (df['High'] - df['Low'])
+    df['DOC'] = abs(df['Open'] - df['Close']) / (df['High'] - df['Low']) #percentage of space taken in DHL by DOC
+
     df_OC = df[['Open','Close']]
-    df_OC['Mid'] = df_OC.median(axis=1)
+    # df_OC['Mid'] = df_OC.median(axis=1)
     df_OC['Max'] = df_OC.max(axis=1)
-    df['PODD'] = df_OC['Mid']
-    for i in range(df.shape[0]):
-        df['PODD'].iloc[i] = (df_OC['Mid'].iloc[i] / df_OC['Max'].iloc[i] - 0.999) * 1000
+    # df['PODD'] = df_OC['Mid']
+    df['PODD'] = ((df_OC['Max'] - (abs(df['Open'] - df['Close'])/2)) - df['Low']) / (df['High'] - df['Low'])
+    #for i in range(df.shape[0]):
+     #   df['PODD'].iloc[i] = (df_OC['Mid'].iloc[i] / df_OC['Max'].iloc[i] - 0.999) * 1000
     return df
 
-datafile="USDJPY_H1_2014_2018.csv"
+def PODD(OPEN, HIGH, LOW, CLOSE):
+    Max = max([OPEN, CLOSE])
+    DOChalf = abs(OPEN - CLOSE) / 2
+    DHLmini = HIGH - LOW
+    print((Max - DOChalf - LOW) / DHLmini)
 
-df = MetaTraderDataConverter(datafile)
-df = NeoCandle(df)
-df = df[:100]
-
-threedee = plt.figure().gca(projection='3d')
-threedee.scatter(df['DOC'], df['DHL'], df['PODD'])
-threedee.set_xlabel('DOC')
-threedee.set_ylabel('DHL')
-threedee.set_zlabel('PODD')
-plt.show()
-
-print(df)
+#PODD(102.748, 102.839, 102.688, 102.791)
